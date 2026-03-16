@@ -35,7 +35,7 @@ namespace MercadoEletronico.Services
                         Timeout = 30000
                     });
 
-                    await CapturarScreenshotAsync("00_antes_login.png");
+                    //await CapturarScreenshotAsync("00_antes_login.png");
 
                     Console.WriteLine("   ⌨️  Preenchendo credenciais...");
                     await _page.FillAsync("#LoginName", contas.Usuarios[i]);
@@ -56,12 +56,12 @@ namespace MercadoEletronico.Services
                     }
 
                     Console.WriteLine($"   ✅ Tentativa de login concluída! URL: {_page.Url}");
-                    await CapturarScreenshotAsync("01_apos_login.png");
+                    //await CapturarScreenshotAsync("01_apos_login.png");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"   ❌ Erro durante login: {ex.Message}");
-                await CapturarScreenshotAsync("erro_login.png");
+                //await CapturarScreenshotAsync("erro_login.png");
                 throw; // Re-lançar para que o fluxo principal saiba do erro
             }
         }
