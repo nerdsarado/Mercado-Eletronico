@@ -15,6 +15,7 @@ namespace MercadoEletronico.Services
 
             _browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
             {
+                ExecutablePath = @"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
                 Headless = true,
                 SlowMo = 300
             });
