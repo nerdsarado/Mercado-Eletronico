@@ -46,10 +46,10 @@ namespace MercadoEletronico.Services
                 if (verDepoisButton != null && await verDepoisButton.IsVisibleAsync())
                 {
                     Console.WriteLine("   ✅ Botão 'Ver depois' encontrado e visível!");
-                    await CapturarScreenshotModalAsync("modal1_ver_depois_antes.png", verDepoisButton);
+                    //await CapturarScreenshotModalAsync("modal1_ver_depois_antes.png", verDepoisButton);
                     await verDepoisButton.ClickAsync();
                     await Task.Delay(1500);
-                    await CapturarScreenshotModalAsync("modal1_ver_depois_depois.png", verDepoisButton);
+                    //await CapturarScreenshotModalAsync("modal1_ver_depois_depois.png", verDepoisButton);
                 }
             }
             catch (Exception ex)
@@ -71,10 +71,10 @@ namespace MercadoEletronico.Services
                 if (okEntendiButton != null && await okEntendiButton.IsVisibleAsync())
                 {
                     Console.WriteLine("   ✅ Botão 'Ok, entendi' encontrado e visível!");
-                    await CapturarScreenshotModalAsync("modal2_ok_entendi_antes.png", okEntendiButton);
+                    //await CapturarScreenshotModalAsync("modal2_ok_entendi_antes.png", okEntendiButton);
                     await okEntendiButton.ClickAsync();
                     await Task.Delay(1500);
-                    await CapturarScreenshotModalAsync("modal2_ok_entendi_depois.png", okEntendiButton);
+                    //await CapturarScreenshotModalAsync("modal2_ok_entendi_depois.png", okEntendiButton);
                 }
             }
             catch (Exception ex)
