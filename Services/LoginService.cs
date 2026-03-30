@@ -2,6 +2,7 @@
 using MercadoEletronico.Models;
 using System.Threading.Tasks;
 using System;
+using System.ComponentModel;
 
 namespace MercadoEletronico.Services
 {
@@ -14,7 +15,7 @@ namespace MercadoEletronico.Services
             _page = page;
         }
 
-        public async Task RealizarLoginAsync(int i)
+        public async Task RealizarLoginAsync(string conta)
         {
             var contas = new Models.Contas();
             Console.WriteLine("\n1. FAZENDO LOGIN...");
@@ -35,11 +36,12 @@ namespace MercadoEletronico.Services
                         Timeout = 30000
                     });
 
-                    //await CapturarScreenshotAsync("00_antes_login.png");
+                //await CapturarScreenshotAsync("00_antes_login.png");
+                var listaUsuarios = contas.Usuarios.ToList();
 
-                    Console.WriteLine("   ⌨️  Preenchendo credenciais...");
-                    await _page.FillAsync("#LoginName", contas.Usuarios[i]);
-                    await _page.FillAsync("#RAWSenha", contas.Senhas[i]);
+                Console.WriteLine("   ⌨️  Preenchendo credenciais...");
+                    await _page.FillAsync("#LoginName", conta);
+                    await _page.FillAsync("#RAWSenha", contas.Senhas[listaUsuarios.IndexOf(conta)]);
 
                     Console.WriteLine("   🔘 Clicando em 'Entrar'...");
                     await _page.ClickAsync("#SubmitAuth");

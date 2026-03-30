@@ -1,5 +1,7 @@
 ﻿using MercadoEletronico.Models;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Playwright;
+using System.ComponentModel;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -1356,74 +1358,77 @@ namespace MercadoEletronico.Services
                 Console.WriteLine($"      ⚠️  Erro ao imprimir PDF: {ex.Message}");
             }
         }
-        public async Task Executar(IPage page, LoginService loginService, ModalHandlerService modalHandler, 
-                                   NavegacaoService navegacaoService, ColetaService coletaService, 
-                                   HashSet<string> cotacoesProcessadas, ExportadorService exportadorService)
+        public async Task Executar(IPage page, ModalHandlerService modalHandler, PlanilhaControleService planilhaControle, HashSet<string> cotacoesProcessadas, string conta)
         {
-            var browserService = new BrowserService();
-            var contas = new Models.Contas();
             try
             {
-                for (int i = 0; i < contas.Usuarios.Count; i++)
-                {
-                    // 4. Fluxo principal
-                    await loginService.RealizarLoginAsync(i);
-                    await modalHandler.LidarComTodosModaisAsync();
+                var browserService = new BrowserService();
+                var contas = new Models.Contas();
+         
+                        // 3. Serviços
+                        var loginService = new LoginService(page);
+                        var navegacaoService = new NavegacaoService(page);
+                        var exportadorService = new ExportadorService();
+                        modalHandler = new ModalHandlerService(page);
+                        ColetaService coletaService = new ColetaService(page, modalHandler, cotacoesProcessadas, planilhaControle);
 
-                    // Verificar se já está na página correta antes de navegar
-                    Console.WriteLine($"\n📍 URL após login: {page.Url}");
+                        await loginService.RealizarLoginAsync(conta);
+                        await modalHandler.LidarComTodosModaisAsync();
 
-                    await navegacaoService.NavegarParaOportunidadesAsync();
-                    Console.WriteLine("\n🔍 VERIFICANDO CONTEÚDO DA PÁGINA...");
-                    var pageContent = await page.ContentAsync();
-                    Console.WriteLine($"   Tamanho do conteúdo: {pageContent.Length} caracteres");
+                        // Verificar se já está na página correta antes de navegar
+                        Console.WriteLine($"\n📍 URL após login: {page.Url}");
 
-                    // Verificar se há cotações no conteúdo
-                    if (pageContent.Contains("FornShowCotacao.asp", StringComparison.OrdinalIgnoreCase))
-                    {
-                        Console.WriteLine("   ✅ Links de cotações encontrados no HTML");
-                    }
+                        await navegacaoService.NavegarParaOportunidadesAsync();
+                        Console.WriteLine("\n🔍 VERIFICANDO CONTEÚDO DA PÁGINA...");
+                        var pageContent = await page.ContentAsync();
+                        Console.WriteLine($"   Tamanho do conteúdo: {pageContent.Length} caracteres");
 
-                    // Procurar por números no conteúdo que pareçam cotações
-                    var cotacaoMatches = Regex.Matches(pageContent, @"Cot=(\d+)");
-                    Console.WriteLine($"   Encontrados {cotacaoMatches.Count} números de cotação no HTML");
-
-                    var elementos = await coletaService.ColetarElementosDeCotacoesAsync();
-
-                    // Filtrar elementos já processados
-                    var elementosNaoProcessados = new List<IElementHandle>();
-                    foreach (var elemento in elementos)
-                    {
-                        try
+                        // Verificar se há cotações no conteúdo
+                        if (pageContent.Contains("FornShowCotacao.asp", StringComparison.OrdinalIgnoreCase))
                         {
-                            var numero = await coletaService.ExtrairNumeroCotacaoElementoAsync(elemento);
-                            if (!string.IsNullOrEmpty(numero) && !cotacoesProcessadas.Contains(numero))
-                            {
-                                elementosNaoProcessados.Add(elemento);
-                            }
-                            else if (!string.IsNullOrEmpty(numero))
-                            {
-                                Console.WriteLine($"   ⏭️  Cotação {numero} já processada, pulando...");
-                            }
+                            Console.WriteLine("   ✅ Links de cotações encontrados no HTML");
                         }
-                        catch { }
-                    }
 
-                    Console.WriteLine($"\n📋 Encontradas {elementos.Count} cotações no total");
-                    Console.WriteLine($"📋 Cotações não processadas: {elementosNaoProcessados.Count}");
+                        // Procurar por números no conteúdo que pareçam cotações
+                        var cotacaoMatches = Regex.Matches(pageContent, @"Cot=(\d+)");
+                        Console.WriteLine($"   Encontrados {cotacaoMatches.Count} números de cotação no HTML");
 
-                    if (elementosNaoProcessados.Count > 0)
-                    {
-                        var cotacoes = await coletaService.ProcessarTodasCotacoesAsync(elementosNaoProcessados);
-                        Console.WriteLine($"\n7. EXPORTANDO PARA EXCEL...");
-                        exportadorService.ExportarParaExcel(cotacoes);
-                        Console.WriteLine($"\n✅ Processo concluído! {cotacoes.Count} novas cotações coletadas.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"\nℹ️  Nenhuma cotação nova encontrada para processar.");
-                    }
-                }
+                        var elementos = await coletaService.ColetarElementosDeCotacoesAsync();
+
+                        // Filtrar elementos já processados
+                        var elementosNaoProcessados = new List<IElementHandle>();
+                        foreach (var elemento in elementos)
+                        {
+                            try
+                            {
+                                var numero = await coletaService.ExtrairNumeroCotacaoElementoAsync(elemento);
+                                if (!string.IsNullOrEmpty(numero) && !cotacoesProcessadas.Contains(numero))
+                                {
+                                    elementosNaoProcessados.Add(elemento);
+                                }
+                                else if (!string.IsNullOrEmpty(numero))
+                                {
+                                    Console.WriteLine($"   ⏭️  Cotação {numero} já processada, pulando...");
+                                }
+                            }
+                            catch { }
+                        }
+
+                        Console.WriteLine($"\n📋 Encontradas {elementos.Count} cotações no total");
+                        Console.WriteLine($"📋 Cotações não processadas: {elementosNaoProcessados.Count}");
+
+                        if (elementosNaoProcessados.Count > 0)
+                        {
+                            var cotacoes = await coletaService.ProcessarTodasCotacoesAsync(elementosNaoProcessados);
+                            Console.WriteLine($"\n7. EXPORTANDO PARA EXCEL...");
+                            exportadorService.ExportarParaExcel(cotacoes);
+                            Console.WriteLine($"\n✅ Processo concluído! {cotacoes.Count} novas cotações coletadas.");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"\nℹ️  Nenhuma cotação nova encontrada para processar.");
+                        }
+                
             }
             catch (Exception ex)
             {
