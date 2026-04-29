@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MercadoEletronico")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+98179639eb72a01a889d16e83fb38db8256b7e63")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+07f829f5858566ddcc74136f503379ca5de1fe92")]
 [assembly: System.Reflection.AssemblyProductAttribute("MercadoEletronico")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MercadoEletronico")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

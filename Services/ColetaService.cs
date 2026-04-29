@@ -1362,7 +1362,6 @@ namespace MercadoEletronico.Services
         {
             try
             {
-                var browserService = new BrowserService();
                 var contas = new Models.Contas();
          
                         // 3. Serviços

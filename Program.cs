@@ -1,4 +1,4 @@
-﻿using MercadoEletronico.Services;
+using MercadoEletronico.Services;
 using Microsoft.Playwright;
 using System;
 using System.Text.RegularExpressions;

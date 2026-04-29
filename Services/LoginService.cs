@@ -63,7 +63,6 @@ namespace MercadoEletronico.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"   ❌ Erro durante login: {ex.Message}");
-                //await CapturarScreenshotAsync("erro_login.png");
                 throw; // Re-lançar para que o fluxo principal saiba do erro
             }
         }
